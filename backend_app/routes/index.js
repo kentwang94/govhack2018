@@ -25,8 +25,9 @@ router.post('/path', (req, res) => {
     points2WKT(path)
   ).then(result => {
     let wayPoint = [{lat: -38, lng: 145}, {lat: -39, lng: 146}];
-    resObject.treeCnt = result;
-    resObject.wayPoint = wayPoint;
+    resObject.tree_cnt = result;
+    resObject.way_point = wayPoint;
+    resObject.toilet = [{lat: -37.8063, lng: 144.9596}];
     console.log(resObject);
     res.send(resObject);
   });

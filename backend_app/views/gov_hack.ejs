@@ -130,8 +130,8 @@
       destination: {'placeId': this.destinationPlaceId},
       travelMode: this.travelMode
     }, function (mapResponse, status) {
-      var wayPts = []
-      var features = []
+      //let wayPts = []
+      var features = [];
       if (status === 'OK') {
         // wayPts.push({
         //   location: {lat:-34, lng:151},
@@ -146,6 +146,7 @@
           if (this.readyState === 4 && this.status === 200) {
             let body = xhr.response;
             let toilet_list = body.toilet;
+            let wayPts = body.way_point;
             console.log(body);
             for (var toilet in toilet_list){
               features.push({
