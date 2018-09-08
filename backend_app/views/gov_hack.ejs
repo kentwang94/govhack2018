@@ -270,6 +270,7 @@
         // me.routeTwo(wayPts)
         let xhr = new XMLHttpRequest();
         xhr.open("GET", "/path", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
         xhr.responseType = 'json';
         xhr.onreadystatechange = function () {
           if (this.readyState === 4 && this.status === 200) {
@@ -283,12 +284,12 @@
         let c1 = document.getElementById("fastestRoute").value;
         let c2 = document.getElementById("wandering").value;
         let c3 = document.getElementById("disability").value;
-        xhr.send({
+        xhr.send(JSON.stringify({
           'path': send_path,
           'fastestRoute': c1,
           'wandering': c2,
           'diability': c3
-        })
+        }));
       } else {
         window.alert('Directions request failed due to ' + status);
       }
