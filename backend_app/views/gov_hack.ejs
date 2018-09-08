@@ -148,9 +148,9 @@
             let toilet_list = body.toilet;
             let wayPts = body.way_point;
             console.log(body);
-            for (var toilet in toilet_list){
+            for (let toilet of toilet_list){
               features.push({
-                position: new google.map.LatLng(toilet)
+                position: new google.map.LatLng(toilet.lat, toilet.lng)
               })
 
             }
