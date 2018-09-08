@@ -130,8 +130,6 @@
       destination: {'placeId': this.destinationPlaceId},
       travelMode: this.travelMode
     }, function (mapResponse, status) {
-      //let wayPts = []
-      var features = [];
       if (status === 'OK') {
         // wayPts.push({
         //   location: {lat:-34, lng:151},
@@ -148,11 +146,13 @@
             let toilet_list = body.toilet;
             let pts = body.way_point;
             console.log(body);
+            let features = [];
             for (let toilet of toilet_list){
               features.push({
                 position: new google.maps.LatLng(toilet.lat, toilet.lng)
               })
             }
+            let wayPts = [];
             for (let pt of pts){
               wayPts.push({
                 location: {lat: pt.lat, lng: pt.lng},
