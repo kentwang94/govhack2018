@@ -32,4 +32,10 @@ router.get('/path', (req, res) => {
   });
 });
 
+
+/**
+ * # off street parking
+ * # no.trees / total_foot_path_distance
+ * # ped_volume
+ */
 module.exports = router;
