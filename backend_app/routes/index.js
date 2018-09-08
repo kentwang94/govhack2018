@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
   res.render('gov_hack');
 });
 
-router.get('/path', (req, res) => {
+router.post('/path', (req, res) => {
   console.log(req);
   db.any(
     "SELECT * FROM clean_air LIMIT 1"
