@@ -20,7 +20,7 @@ router.post('/path', (req, res) => {
     "  SELECT ST_LineFromText($1) AS geom " +
     ") " +
     "SELECT COUNT(*) " +
-    "FROM clean_trees " +
+    "FROM clean_trees, path " +
     "WHERE ST_DWithin(clean_trees.geom, path.geom, 100, TRUE)",
     points2WKT(path)
   ).then(result => {
