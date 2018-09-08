@@ -123,7 +123,7 @@
     if (!this.originPlaceId || !this.destinationPlaceId) {
       return;
     }
-    //var me = this;
+    var me = this;
 
     this.directionsService.route({
       origin: {'placeId': this.originPlaceId},
@@ -154,7 +154,7 @@
 
             }
             
-            //me.routeTwo(wayPts, features);
+            me.routeTwo(wayPts, features);
           }
         };
         let send_path = (mapResponse.routes[0].overview_path).map(x => x.toJSON());
