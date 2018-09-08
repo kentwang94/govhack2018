@@ -8,27 +8,16 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/path', (req, res) => {
-
-  let wayPoint = [
-    {
-      lat: 1,
-      lon: 2
-    },
-    {
-      lat: 3,
-      lon: 4
-    }
-  ];
-
+  console.log(req.body);
   db.any(
     "SELECT * FROM clean_air LIMIT 1"
   ).then(result => {
-    let renderObject = {};
-    renderObject.title = 'Bookings';
-    renderObject.bookingList = result;
-    renderObject.wayPoint = wayPoint;
-    console.log(renderObject);
-    res.render('index', renderObject);
+    let resObject = {};
+    resObject.title = 'Bookings';
+    resObject.bookingList = result;
+    resObject.wayPoint = wayPoint;
+    console.log(resObject);
+    res.send(resObject);
   });
 });
 
