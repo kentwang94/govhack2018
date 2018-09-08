@@ -12,6 +12,7 @@ router.get('/path', (req, res) => {
   db.any(
     "SELECT * FROM clean_air LIMIT 1"
   ).then(result => {
+    let wayPoint = {lat: 10, lon: -10};
     let resObject = {};
     resObject.title = 'Bookings';
     resObject.bookingList = result;

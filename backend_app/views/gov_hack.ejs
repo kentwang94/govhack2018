@@ -280,7 +280,6 @@
         };
         let send_path = (mapResponse.routes[0].overview_path).map(x => x.toJSON());
         console.log(send_path);
-        xhr.send(send_path)
         let c1 = document.getElementById("fastestRoute").value;
         let c2 = document.getElementById("wandering").value;
         let c3 = document.getElementById("disability").value;
