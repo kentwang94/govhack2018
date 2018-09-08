@@ -269,7 +269,7 @@
         // });
         // me.routeTwo(wayPts)
         let xhr = new XMLHttpRequest();
-        xhr.open("GET", "/path", true);
+        xhr.open("POST", "/path", true);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.responseType = 'json';
         xhr.onreadystatechange = function () {
@@ -284,12 +284,13 @@
         let c1 = document.getElementById("fastestRoute").value;
         let c2 = document.getElementById("wandering").value;
         let c3 = document.getElementById("disability").value;
-        xhr.send(JSON.stringify({
+        let sen = JSON.stringify({
           'path': send_path,
           'fastestRoute': c1,
           'wandering': c2,
           'diability': c3
-        }));
+        });
+        xhr.send(sen);
       } else {
         window.alert('Directions request failed due to ' + status);
       }
