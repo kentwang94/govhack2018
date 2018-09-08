@@ -8,20 +8,19 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/path', (req, res) => {
-  console.log(req.body);
+  console.log(req);
   db.any(
     "SELECT * FROM clean_air LIMIT 1"
   ).then(result => {
     let wayPoint = {lat: 10, lon: -10};
     let resObject = {};
-    resObject.title = 'Bookings';
-    resObject.bookingList = result;
+    resObject.result = result;
     resObject.wayPoint = wayPoint;
     console.log(resObject);
     res.send(resObject);
   });
 });
- 
+
 
 /**
  * # off street parking
