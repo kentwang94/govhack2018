@@ -24,7 +24,7 @@ router.post('/path', (req, res) => {
     "WHERE ST_DWithin(clean_trees.geom, path.geom, 100, TRUE)",
     points2WKT(path)
   ).then(result => {
-    let wayPoint = [{lat: -38, lng: 145}, {lat: -39, lng: 146}];
+    let wayPoint = [{lat: -37.81, lng: 144.96}, {lat: -37.80, lng: 144.95}];
     resObject.tree_cnt = result;
     resObject.way_point = wayPoint;
     resObject.toilet = [{lat: -37.8063, lng: 144.9596}];
