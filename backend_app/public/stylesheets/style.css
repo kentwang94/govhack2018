@@ -1,8 +1,222 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+/*====================Basic Setup =========================*/
+*,
+*::after,
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
 }
 
-a {
-  color: #00B7FF;
+/* Optional: Makes the sample page fill the window. */
+html {
+    font-size: 62.5%;
+}
+
+body {
+    box-sizing: border-box;
+    min-width: 550px;
+    /* 2x LC width + RC width */
+}
+
+/*======================Head================================*/
+ul {
+    font-size: 1.5rem;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgba(51, 51, 51, 0.295);
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+    background-color: #111;
+}
+
+li:last-child {
+    float: right;
+}
+
+li:nth-last-child(2) {
+    float: right;
+}
+
+/*========================Input Box=========================*/
+.controls {
+    margin-top: 10px;
+    border: 1px solid transparent;
+    border-radius: 2px 0 0 2px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 32px;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+#origin-input,
+#destination-input {
+    background-color: #fff;
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+    margin-left: 12px;
+    padding: 0 11px 0 13px;
+    text-overflow: ellipsis;
+    width: 200px;
+}
+
+#origin-input:focus,
+#destination-input:focus {
+    border-color: #4d90fe;
+}
+
+/*==========================Sidebar=========================*/
+.sidebar {
+    height: 100%;
+    /* 100% Full-height */
+    width: 0;
+    /* 0 width - change this with JavaScript */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Stay on top */
+    top: 0;
+    left: 0;
+    background-color: #111;
+    /* Black*/
+    overflow-x: hidden;
+    /* Disable horizontal scroll */
+    padding-top: 60px;
+    /* Place content 60px from the top */
+    transition: 0.5s;
+    /* 0.5 second transition effect to slide in the sidebar */
+    opacity: 0.6;
+}
+
+.sidebar a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    color: #f1f1f1;
+}
+
+.sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.openbtn {
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #111;
+    color: black;
+    padding: 10px 15px;
+    border: none;
+}
+
+.openbtn:hover {
+    background-color: #444;
+}
+
+#main {
+    top: 50px;
+    position: fixed;
+    transition: margin-left .5s;
+    /* If you want a transition effect */
+    margin-left: 5px;
+    z-index: 2000;
+    opacity: 0.5;
+}
+
+.checkForm {
+    color: white;
+    opacity: 0.8;
+}
+
+.checkForm input {
+    font-size: 2rem;
+}
+
+span {
+    margin-left: 2rem;
+}
+
+@media screen and (max-height: 450px) {
+    .sidebar {
+        padding-top: 15px;
+    }
+
+    .sidebar a {
+        font-size: 18px;
+    }
+}
+
+/*-------------Center-------------*/
+/* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+#map {
+    height: 100%;
+}
+
+#container {
+    padding-left: 80px;
+    /* LC width */
+    padding-right: 180px;
+    /* RC width */
+    height: 100vh;
+}
+
+#container .column {
+    position: relative;
+    float: left;
+}
+
+#map {
+    width: 100%;
+}
+
+#left {
+    width: 80px;
+    /* LC width */
+    right: 80px;
+    /* LC width */
+    height: 100%;
+    margin-left: -100%;
+    /* background-color: #111; */
+}
+
+#right {
+    width: 180px;
+    /* RC width */
+    margin-right: -180px;
+    height: 100%;
+    /* RC width */
+    /* background-color: rgba(51, 51, 51, 0.295); */
+    /* border: 1px solid black; */
+}
+
+/*==========================Footer================*/
+#footer {
+    clear: both;
 }

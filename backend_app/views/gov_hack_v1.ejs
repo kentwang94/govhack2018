@@ -1,40 +1,157 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Place Autocomplete and Directions</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <link rel="stylesheet" href="/stylesheets/style.css">
-  </head>
-  <body>
-    <div id="header">
-      <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Login</a></li>
-        <li><a href="#">Signup</a></li>
-      </ul>
-    </div>
-    <input id="origin-input" class="controls" type="text" placeholder="Origin location">
-    <input id="destination-input" class="controls" type="text" placeholder="Destination location">
-    <div id="mySidebar" class="sidebar">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-      <form class="checkForm">
-        <input id="fastestRoute" type="checkbox" onchange='handleChange(this);' value=false><span>Fastest Route</span><br>
-        <input id="wandering" type="checkbox" onchange='handleChange(this);' value=false><span>Wandering</span><br>
-        <input id="disability" type="checkbox" onchange='handleChange(this);' value=false><span>Disability</span>
-      </form>
-      </div>
-      <div id="main">
-        <button class="openbtn" onclick="openNav()">&#9776;</button>
-      </div>
-      <div id="container">
-        <div id="map" class="column"></div>
-        <div id="left" class="column"></div>
-        <div id="right" class="column"></div>
-      </div>
-      
-      <div id="footer"></div>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .controls {
+            margin-top: 10px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #origin-input,
+        #destination-input {
+            background-color: #fff;
+            font-family: Roboto;
+            font-size: 15px;
+            font-weight: 300;
+            margin-left: 12px;
+            padding: 0 11px 0 13px;
+            text-overflow: ellipsis;
+            width: 200px;
+        }
+
+        #origin-input:focus,
+        #destination-input:focus {
+            border-color: #4d90fe;
+        }
+
+        .sidebar {
+            height: 100%; /* 100% Full-height */
+            width: 0; /* 0 width - change this with JavaScript */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Stay on top */
+            top: 0;
+            left: 0;
+            background-color: #111; /* Black*/
+            overflow-x: hidden; /* Disable horizontal scroll */
+            padding-top: 60px; /* Place content 60px from the top */
+            transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
+            opacity: 0.6;
+        }
+
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        .openbtn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #111;
+            color: black;
+            padding: 10px 15px;
+            border: none;
+        }
+
+        .openbtn:hover {
+            background-color: #444;
+        }
+
+        #main {
+            top: 40px;
+            position: fixed;
+            transition: margin-left .5s; /* If you want a transition effect */
+            padding: 20px;
+            z-index: 2000;
+            opacity: 0.5;
+        }
+
+        .checkForm {
+            color: white;
+            opacity: 0.8;
+        }
+
+        @media screen and (max-height: 450px) {
+            .sidebar {
+                padding-top: 15px;
+            }
+
+            .sidebar a {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<input id="origin-input" class="controls" type="text"
+       placeholder="Origin location">
+
+<input id="destination-input" class="controls" type="text"
+       placeholder="Destination location">
+
+<div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <form class="checkForm">
+        <input id="fastestRoute" type="checkbox" onchange='handleChange(this);' value=false>Fastest Route<br>
+        <input id="wandering" type="checkbox" onchange='handleChange(this);' value=false>Wandering <br>
+        <input id="disability" type="checkbox" onchange='handleChange(this);' value=false>Disability
+    </form>
+</div>
+
+<div id="main">
+    <button class="openbtn" onclick="openNav()">&#9776;</button>
+</div>
+
+
+<!-- <div id="mode-selector" class="controls">
+  <input type="radio" name="type" id="changemode-walking" checked="checked">
+  <label for="changemode-walking">Walking</label>
+
+  <input type="radio" name="type" id="changemode-transit">
+  <label for="changemode-transit">Transit</label>
+
+  <input type="radio" name="type" id="changemode-driving">
+  <label for="changemode-driving">Driving</label>
+</div> -->
+
+<div id="map"></div>
 
 <script>
   // This example requires the Places library. Include the libraries=places
@@ -91,14 +208,28 @@
     var destinationAutocomplete = new google.maps.places.Autocomplete(
       destinationInput, {placeIdOnly: true});
 
+    // this.setupClickListener('changemode-walking', 'WALKING');
+    // this.setupClickListener('changemode-transit', 'TRANSIT');
+    // this.setupClickListener('changemode-driving', 'DRIVING');
+
     this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
     this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
 
     this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
     this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(destinationInput);
-
+    // this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
   }
 
+  // Sets a listener on a radio button to change the filter type on Places
+  // Autocomplete.
+  // AutocompleteDirectionsHandler.prototype.setupClickListener = function(id, mode) {
+  //   var radioButton = document.getElementById(id);
+  //   var me = this;
+  //   radioButton.addEventListener('click', function() {
+  //     me.travelMode = mode;
+  //     me.route();
+  //   });
+  // };
 
   AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function (autocomplete, mode) {
     var me = this;
@@ -131,7 +262,6 @@
       travelMode: this.travelMode
     }, function (mapResponse, status) {
       var wayPts = []
-      var features = []
       if (status === 'OK') {
         // wayPts.push({
         //   location: {lat:-34, lng:151},
@@ -145,27 +275,17 @@
         xhr.onreadystatechange = function () {
           if (this.readyState === 4 && this.status === 200) {
             let body = xhr.response;
-            let toilet_list = body.toilet;
             console.log(body);
-            for (var toilet in toilet_list){
-              features.push({
-                position: new google.map.LatLng(toilet)
-              })
-
-            }
-            
-            //me.routeTwo(wayPts, features);
+            //me.routeTwo(wayPts);
           }
         };
         let send_path = (mapResponse.routes[0].overview_path).map(x => x.toJSON());
-        let dist_path = (mapResponse.routes[0].legs).reduce((x, y) => x + y.distance);
         console.log(send_path);
         let c1 = document.getElementById("fastestRoute").value;
         let c2 = document.getElementById("wandering").value;
         let c3 = document.getElementById("disability").value;
         xhr.send(JSON.stringify({
           'path': send_path,
-          'distance': dist_path,
           'fastestRoute': c1,
           'wandering': c2,
           'diability': c3
@@ -175,13 +295,11 @@
       }
     });
   };
-  AutocompleteDirectionsHandler.prototype.routeTwo = function (waypts, features) {
+  AutocompleteDirectionsHandler.prototype.routeTwo = function (waypts) {
     if (!this.originPlaceId || !this.destinationPlaceId) {
       return;
     }
     var me = this;
-    var toiletIcon = '/toilet.png';
-
     this.directionsService.route({
       origin: {'placeId': this.originPlaceId},
       destination: {'placeId': this.destinationPlaceId},
@@ -191,13 +309,6 @@
     }, function (response, status) {
       if (status === 'OK') {
         me.directionsDisplay.setDirections(response);
-        features.forEach(function(feature) {
-          var marker = new google.map.Marker({
-            position: feature.position,
-            icon: toiletIcon,
-            map:map
-          })
-        });
       } else {
         window.alert('Directions request failed due to ' + status);
       }
