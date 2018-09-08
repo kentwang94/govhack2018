@@ -33,7 +33,7 @@
         <div id="left" class="column"></div>
         <div id="right" class="column"></div>
       </div>
-      
+
       <div id="footer"></div>
 
 <script>
@@ -145,6 +145,7 @@
             let body = xhr.response;
             let toilet_list = body.toilet;
             let pts = body.way_point;
+            let sensorList = body.sensor_list;
             console.log(body);
             let features = [];
             for (let toilet of toilet_list){
@@ -158,6 +159,12 @@
                 location: {lat: pt.lat, lng: pt.lng},
                 stopover: true
               });
+            }
+            let sensors = []
+            for (var sensor in sensorList){
+              sensors.push(
+                sensor: {center:{lat: sensor.lat, lng:sensor.lng}, radius:sensor.radius}
+              )
             }
             me.routeTwo(wayPts, features);
           }
@@ -203,6 +210,18 @@
             map:map
           })
         });
+        for (var i in sensors) {
+          var volumeCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: sensors[i].center,
+            radius: sensors[i].radius
+          });
+        }
       } else {
         window.alert('Directions request failed due to ' + status);
       }
