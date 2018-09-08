@@ -21,7 +21,7 @@ router.get('/path', (req, res) => {
     res.send(resObject);
   });
 });
-
+ 
 
 /**
  * # off street parking
