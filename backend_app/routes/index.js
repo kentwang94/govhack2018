@@ -27,6 +27,7 @@ router.get('/path', (req, res) => {
     renderObject.title = 'Bookings';
     renderObject.bookingList = result;
     renderObject.wayPoint = wayPoint;
+    console.log(renderObject);
     res.render('index', renderObject);
   });
 });
