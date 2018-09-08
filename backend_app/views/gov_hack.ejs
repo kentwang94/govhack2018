@@ -146,15 +146,19 @@
           if (this.readyState === 4 && this.status === 200) {
             let body = xhr.response;
             let toilet_list = body.toilet;
-            let wayPts = body.way_point;
+            let pts = body.way_point;
             console.log(body);
             for (let toilet of toilet_list){
               features.push({
                 position: new google.maps.LatLng(toilet.lat, toilet.lng)
               })
-
             }
-            
+            for (let pt of pts){
+              wayPts.push({
+                location: {lat: pt.lat, lng: pt.lng},
+                stopover: true
+              });
+            }
             me.routeTwo(wayPts, features);
           }
         };
