@@ -68,7 +68,7 @@ router.post('/path', (req, res) => {
         "), sensors AS ( " +
         "  SELECT sensor_id, geom " +
         "  FROM ped_sensor " +
-        "  WHERE ST_DWithin(ped_sensor.geom, (SELECT ST_LineFromText('$1')), 1200, TRUE)" +
+        "  WHERE ST_DWithin(ped_sensor.geom, (SELECT ST_LineFromText($1)), 300, TRUE)" +
         "), max_cnt AS ( " +
         "  SELECT MAX(hourly_counts) AS ans " +
         "  FROM distinct_foot " +
