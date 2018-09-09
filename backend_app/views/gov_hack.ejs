@@ -218,7 +218,7 @@
                 stopover: true
               });
             }
-            for (var sensor in sensorList){
+            for (let sensor of sensorList){
               sensors.push({
                 sensor: {center:{lat: sensor.lat, lng:sensor.lng}, radius:sensor.radius}
               });
@@ -274,7 +274,7 @@
             position: feature.position,
             icon: {
               url: '/images/toilet.png',
-              scaledSize: new google.maps.Size(20, 20),
+              scaledSize: new google.maps.Size(25, 25),
               origin: new google.maps.Point(0,0), // origin
               anchor: new google.maps.Point(0, 0)
             },
