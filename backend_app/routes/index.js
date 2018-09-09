@@ -91,9 +91,9 @@ router.post('/path', (req, res) => {
         resObject.toilet = result;
         http.get('http://43.240.99.61:16666/dialogflow?endLatitude=' +
           distance['end_location']['lat'] + '&endLongitude=' + distance['end_location']['lng'],
-          (res) => {
-            const {statusCode} = res;
-            const contentType = res.headers['content-type'];
+          (serRes) => {
+            const {statusCode} = serRes;
+            const contentType = serRes.headers['content-type'];
 
             let error;
             if (statusCode !== 200) {
@@ -106,15 +106,15 @@ router.post('/path', (req, res) => {
             if (error) {
               console.error(error.message);
               // consume response data to free up memory
-              res.resume();
+              serRes.resume();
               return;
             }
-            res.setEncoding('utf8');
+            serRes.setEncoding('utf8');
             let rawData = '';
-            res.on('data', (chunk) => {
+            serRes.on('data', (chunk) => {
               rawData += chunk;
             });
-            res.on('end', () => {
+            serRes.on('end', () => {
               try {
                 const parsedData = JSON.parse(rawData);
                 console.log(parsedData);
@@ -154,7 +154,6 @@ router.post('/path', (req, res) => {
           console.error(`Got error: ${e.message}`);
         });
       });
-
     });
   });
 });
