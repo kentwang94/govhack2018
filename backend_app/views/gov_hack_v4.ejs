@@ -4,7 +4,7 @@
     <title>Place Autocomplete and Directions</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
   </head>
   <body>
     <div id="header">
@@ -16,22 +16,58 @@
       </ul>
     </div>
     <input id="origin-input" class="controls" type="text" placeholder="Origin location">
-    <input id="destination-input" class="controls" type="text" placeholder="Destination location">
-    <div id="mySidebar" class="sidebar">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <input id="destination-input" class="controls" left = 300px type="text" placeholder="Destination location">
+    
+    <div id="leftSidebar" class="leftSidebar">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeLeftNav()">&times;</a>
       <form class="checkForm">
         <input id="fastestRoute" type="checkbox" onchange='handleChange(this);' value=false><span>Fastest Route</span><br>
         <input id="wandering" type="checkbox" onchange='handleChange(this);' value=false><span>Wandering</span><br>
         <input id="disability" type="checkbox" onchange='handleChange(this);' value=false><span>Disability</span>
       </form>
+    </div>
+    
+    
+    <div id="rightSidebar" class="rightSidebar">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeRightNav()">&times;</a>
+      <div id="mode-selector" class="controls">
+        <h1>
+          Our Suggestion:
+        </h1>
+        <br>
+        <p id="output_1" style ="font-size: 17px"></p>
+        <br>
+        <p id="output_2" style ="font-size: 17px"></p>
+        <br>
+        <p id="output_3" style ="font-size: 17px"></p>
+        <br>
+        <p id="output_4" style ="font-size: 17px"></p>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+       <h2>You can decide which travaling mode you want to use:</h2>
+        <br>
+        <br>
+        <input type="radio" name="type" id="walking">
+        <label id = "walking_v" for="walking" >Walking </label>
+        <br>
+        <input type="radio" name="type" id="driving">
+        <label id = "driving_v" for="driving"> Driving</label>
       </div>
-      <div id="main">
-        <button class="openbtn" onclick="openNav()">&#9776;</button>
+    </div>
+
+
+      <div id="leftSide">
+        <button id="openLeftNav" class="openbtn" onclick="openLeftNav()">&#9776;</button>
       </div>
+
       <div id="container">
         <div id="map" class="column"></div>
         <div id="left" class="column"></div>
-        <div id="right" class="column"></div>
+        <!-- <div id="right" class="column"></div> -->
       </div>
 
       <div id="footer"></div>
@@ -42,14 +78,15 @@
   // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 
 
-  function openNav() {
-    document.getElementById("mySidebar").style.width = "250px";
-    document.getElementById("main").style.marginLeft = "250px";
+  function openLeftNav() {
+    document.getElementById("leftSidebar").style.width = "15%";
+    document.getElementById("leftSide").style.marginLeft = "15%";
   }
 
-  function closeNav() {
-    document.getElementById("mySidebar").style.width = "0";
-    document.getElementById("main").style.marginLeft = "0";
+  function closeLeftNav() {
+    document.getElementById("leftSidebar").style.width = "0";
+    document.getElementById("leftSide").style.marginLeft = "0";
+    document.getElementById("openLeftNav").style.display = "inline-block";
   }
 
   function handleChange(checkbox) {
@@ -58,6 +95,11 @@
     } else {
       document.getElementById("fastestRoute").value = true
     }
+  }
+
+  function closeRightNav(){
+    document.getElementById("rightSidebar").style.width = "0";
+    document.getElementById("map").style.width = "100%";
   }
 
 
@@ -81,7 +123,6 @@
     this.travelMode = 'WALKING';
     var originInput = document.getElementById('origin-input');
     var destinationInput = document.getElementById('destination-input');
-    // var modeSelector = document.getElementById('mode-selector');
     this.directionsService = new google.maps.DirectionsService;
     this.directionsDisplay = new google.maps.DirectionsRenderer;
     this.directionsDisplay.setMap(map);
@@ -96,6 +137,15 @@
 
     this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
     this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(destinationInput);
+
+// for testing
+    // document.getElementById("rightSidebar").style.width = "19%";
+    // document.getElementById("map").style.width = "80%";
+
+    // document.getElementById("output_1").innerHTML = "The air quality is very good."
+    // document.getElementById("output_2").innerHTML = "There is 100% availability of car park around your destination."
+    // document.getElementById("output_3").innerHTML = "The weather is very good."
+    // document.getElementById("output_4").innerHTML = "We suggest you to walk."
 
   }
 
@@ -124,49 +174,56 @@
       return;
     }
     var me = this;
-
+    let features = [];
+    let wayPts = [];
+    let sensors = [];
     this.directionsService.route({
       origin: {'placeId': this.originPlaceId},
       destination: {'placeId': this.destinationPlaceId},
       travelMode: this.travelMode
     }, function (mapResponse, status) {
       if (status === 'OK') {
-        // wayPts.push({
-        //   location: {lat:-34, lng:151},
-        //   stopover: true
-        // });
-        // me.routeTwo(wayPts)
         let xhr = new XMLHttpRequest();
         xhr.open("POST", "/path", true);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.responseType = 'json';
+        me.setupClickListener('walking', 'WALKING',wayPts,features, sensors);
+        me.setupClickListener('driving', 'DRIVING', wayPts,features, sensors); 
         xhr.onreadystatechange = function () {
           if (this.readyState === 4 && this.status === 200) {
             let body = xhr.response;
             let toilet_list = body.toilet;
             let pts = body.way_point;
             let sensorList = body.sensor_list;
+            let sug = body.suggestion;
             console.log(body);
-            let features = [];
             for (let toilet of toilet_list){
               features.push({
                 position: new google.maps.LatLng(toilet.lat, toilet.lng)
-              })
+              });
             }
-            let wayPts = [];
             for (let pt of pts){
               wayPts.push({
                 location: {lat: pt.lat, lng: pt.lng},
                 stopover: true
               });
             }
-            let sensors = []
             for (var sensor in sensorList){
-              sensors.push(
+              sensors.push({
                 sensor: {center:{lat: sensor.lat, lng:sensor.lng}, radius:sensor.radius}
-              )
+              });
             }
-            me.routeTwo(wayPts, features);
+            let output_one = "The air quality is " + sug.air_quality + ".";
+            let output_two = "There is " + sug.car_park_vacant_rate * 100 + "% availability of car park around your destination.";
+            let output_three = "The weather is " + sug.weather + "." ;
+            let output_four = "We suggest you to " + sug.mode + ".";
+            document.getElementById("output_1").innerHTML = output_one
+            document.getElementById("output_2").innerHTML = output_two
+            document.getElementById("output_3").innerHTML = output_three
+            document.getElementById("output_4").innerHTML = output_four
+
+            document.getElementById("rightSidebar").style.width = "19%";
+            document.getElementById("map").style.width = "80%";  
           }
         };
         let send_path = (mapResponse.routes[0].overview_path).map(x => x.toJSON());
@@ -187,29 +244,29 @@
       }
     });
   };
-  AutocompleteDirectionsHandler.prototype.routeTwo = function (waypts, features) {
+
+  AutocompleteDirectionsHandler.prototype.routeTwo = function (waypts, features, sensors) {
     if (!this.originPlaceId || !this.destinationPlaceId) {
       return;
     }
     var me = this;
     var toiletIcon = '/toilet.png';
-
     this.directionsService.route({
       origin: {'placeId': this.originPlaceId},
       destination: {'placeId': this.destinationPlaceId},
-      travelMode: this.travelMode,
-      waypoints: waypts,
-      optimizeWaypoints: true
+      travelMode: me.travelMode,
+      //waypoints: waypts,
+      //optimizeWaypoints: true
     }, function (response, status) {
-      if (status === 'OK') {
+      if (status === 'OK') { 
         me.directionsDisplay.setDirections(response);
-        features.forEach(function(feature) {
+        for (var feature in features) {
           var marker = new google.map.Marker({
             position: feature.position,
             icon: toiletIcon,
             map:map
-          })
-        });
+          });
+        }
         for (var i in sensors) {
           var volumeCircle = new google.maps.Circle({
             strokeColor: '#FF0000',
@@ -228,8 +285,22 @@
     });
   };
 
+  AutocompleteDirectionsHandler.prototype.setupClickListener = function(id, mode, wayPts, features, sensors) {
+        var radioButton = document.getElementById(id);
+        var me = this;
+        radioButton.addEventListener('click', function() {
+          me.travelMode = mode;
+          me.routeTwo(wayPts, features, sensors);
+        });
+      };
+
+
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAty0toJ0mIxSCgA03HJq2IcgLArpRh1Rk&libraries=places&callback=initMap"
+        async defer></script>
+</body>
+</html>
+js?key=AIzaSyAty0toJ0mIxSCgA03HJq2IcgLArpRh1Rk&libraries=places&callback=initMap"
         async defer></script>
 </body>
 </html>

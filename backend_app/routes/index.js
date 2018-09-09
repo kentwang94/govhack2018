@@ -68,7 +68,7 @@ router.post('/path', (req, res) => {
         "), sensors AS ( " +
         "  SELECT sensor_id, geom " +
         "  FROM ped_sensor " +
-        "  WHERE ST_DWithin(ped_sensor.geom, (SELECT ST_LineFromText($1)), 300, TRUE) " +
+        "  WHERE ST_DWithin(ped_sensor.geom, (SELECT ST_LineFromText($1)), 250, TRUE) " +
         "), max_cnt AS ( " +
         "  SELECT MAX(hourly_counts) AS ans " +
         "  FROM distinct_foot " +
@@ -93,13 +93,13 @@ router.post('/path', (req, res) => {
         }
         resObject.sensor_list = _sensors;
         resObject.way_point = [];
-        let avg_cnt = (result.reduce((x, y) => x + y.cnt)) / result.length;
+        let avg_cnt = (result.reduce((x, y) => x + parseFloat(y.cnt))) / result.length;
         _foot_per = avg_cnt > 2000 ? 1 : avg_cnt / 2000;
       });
       db.any( // Query toilets with disabled accessibility within 300 metres
         "SELECT lat, lon AS lng " +
         "FROM clean_wheeltoilets " +
-        "WHERE ST_DWithin(geom,(SELECT ST_LineFromText($1)),300, TRUE)",
+        "WHERE ST_DWithin(geom,(SELECT ST_LineFromText($1)), 300, TRUE)",
         pathStr
       ).then(result => {
         resObject.toilet = result;

@@ -21,8 +21,17 @@
     <div id="leftSidebar" class="leftSidebar">
       <a href="javascript:void(0)" class="closebtn" onclick="closeLeftNav()">&times;</a>
       <form class="checkForm">
-        <input id="fastestRoute" type="checkbox" onchange='handleChange(this);' value=false><span>Fastest Route</span><br>
-        <input id="wandering" type="checkbox" onchange='handleChange(this);' value=false><span>Wandering</span><br>
+        <h2>Personal</h2>
+        <br>
+        <br>
+        <input id="fastestRoute" type="checkbox" onchange='handleChange(this);' value=false><span>Fastest</span>
+        <br>
+        <br>
+        <br>
+        <input id="wandering" type="checkbox" onchange='handleChange(this);' value=false><span>Wandering</span>
+        <br>
+        <br>
+        <br>
         <input id="disability" type="checkbox" onchange='handleChange(this);' value=false><span>Disability</span>
       </form>
     </div>
@@ -214,7 +223,7 @@
               });
             }
             let output_one = "The air quality is " + sug.air_quality + ".";
-            let output_two = "There is " + sug.car_park_vacant_rate * 100 + "% availability of car park around your destination.";
+            let output_two = "There is " + Math.round(sug.car_park_vacant_rate * 100) + "% availability of car park around your destination.";
             let output_three = "The weather is " + sug.weather + "." ;
             let output_four = "We suggest you to " + sug.mode + ".";
             document.getElementById("output_1").innerHTML = output_one
@@ -250,7 +259,7 @@
       return;
     }
     var me = this;
-    var toiletIcon = '/toilet.png';
+    var toiletIcon = '/images/toilet.png';
     this.directionsService.route({
       origin: {'placeId': this.originPlaceId},
       destination: {'placeId': this.destinationPlaceId},
@@ -297,10 +306,6 @@
 
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAty0toJ0mIxSCgA03HJq2IcgLArpRh1Rk&libraries=places&callback=initMap"
-        async defer></script>
-</body>
-</html>
-js?key=AIzaSyAty0toJ0mIxSCgA03HJq2IcgLArpRh1Rk&libraries=places&callback=initMap"
         async defer></script>
 </body>
 </html>
