@@ -306,6 +306,8 @@
         //   });
         // }
         for (let i of sensors) {
+          console.log(i.center);
+          console.log(i.radius);
           var volumeCircle = new google.maps.Circle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
@@ -314,7 +316,7 @@
             fillOpacity: 0.35,
             map: map,
             center: i.center,
-            radius: i.radius
+            radius: i.radius*100
           });
         }
       } else {
