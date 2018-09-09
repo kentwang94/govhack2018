@@ -95,7 +95,7 @@ router.post('/path', (req, res) => {
         }
         resObject.sensor_list = _sensors;
         resObject.way_point = [];
-        let avg_cnt = avg_cnt / result.length;
+        let avg_cnt = _sum_cnt / result.length;
         _foot_per = avg_cnt > 2000 ? 1 : avg_cnt / 2000;
       });
       db.any( // Query toilets with disabled accessibility within 300 metres

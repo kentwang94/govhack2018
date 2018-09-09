@@ -260,7 +260,6 @@
       return;
     }
     var me = this;
-    var toiletIcon = '/images/toilet.png';
     this.directionsService.route({
       origin: {'placeId': this.originPlaceId},
       destination: {'placeId': this.destinationPlaceId},
@@ -273,8 +272,14 @@
         features.forEach(function(feature) {
           var marker = new google.maps.Marker({
             position: feature.position,
-            icon: toiletIcon,
-            map: map
+            icon: {
+              url: '/images/toilet.png',
+              scaledSize: new google.maps.Size(20, 20),
+              origin: new google.maps.Point(0,0), // origin
+              anchor: new google.maps.Point(0, 0)
+            },
+            map: map,
+
           });
         });
         sensors.forEach(function(sensor) {
