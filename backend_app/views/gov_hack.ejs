@@ -86,6 +86,7 @@
   // parameter when you first load the API. For example:
   // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 
+  var map;
 
   function openLeftNav() {
     document.getElementById("leftSidebar").style.width = "15%";
@@ -113,7 +114,7 @@
 
 
   function initMap() {
-    var map = new google.maps.Map(document.getElementById('map'), {
+    map = new google.maps.Map(document.getElementById('map'), {
       mapTypeControl: false,
       center: {lat: -37.8, lng: 144.96},
       zoom: 13
@@ -269,14 +270,14 @@
     }, function (response, status) {
       if (status === 'OK') { 
         me.directionsDisplay.setDirections(response);
-        for (var feature in features) {
-          var marker = new google.map.Marker({
+        features.forEach(function(feature) {
+          var marker = new google.maps.Marker({
             position: feature.position,
             icon: toiletIcon,
-            map:map
+            map: map
           });
-        }
-        for (var i in sensors) {
+        });
+        sensors.forEach(function(sensor) {
           var volumeCircle = new google.maps.Circle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
@@ -284,10 +285,29 @@
             fillColor: '#FF0000',
             fillOpacity: 0.35,
             map: map,
-            center: sensors[i].center,
-            radius: sensors[i].radius
+            center: sensor.center,
+            radius: sensor.radius
           });
-        }
+        });
+        // for (var feature in features) {
+        //   var marker = new google.maps.Marker({
+        //     position: feature.position,
+        //     icon: toiletIcon,
+        //     map:map
+        //   });
+        // }
+        // for (let i of sensors) {
+        //   var volumeCircle = new google.maps.Circle({
+        //     strokeColor: '#FF0000',
+        //     strokeOpacity: 0.8,
+        //     strokeWeight: 2,
+        //     fillColor: '#FF0000',
+        //     fillOpacity: 0.35,
+        //     map: map,
+        //     center: sensors[i].center,
+        //     radius: sensors[i].radius
+        //   });
+        // }
       } else {
         window.alert('Directions request failed due to ' + status);
       }
