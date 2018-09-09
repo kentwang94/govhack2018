@@ -30,6 +30,8 @@ router.post('/path', (req, res) => {
   ).then(result => {
     let wayPoint = [{lat: -37.81, lng: 144.96}, {lat: -37.80, lng: 144.95}];
     resObject.tree_cnt = result;
+    resObject.tree_dist = distance;
+    resObject.tree_per = result / distance;
     resObject.way_point = wayPoint;
     resObject.toilet = [{lat: -37.8063, lng: 144.9596}];
     db.one( //Query the total parking spaces within 250 metres within the destination
@@ -38,12 +40,11 @@ router.post('/path', (req, res) => {
       ") " +
       "SELECT SUM(parking_spaces) AS total " +
       "FROM clean_off_parking, destination " +
-      "WHERE ST_DWithin(clean_off_parking.geom, destination.geom, 250, TRUE) " +
-      "GROUP BY parking_spaces;",
+      "WHERE ST_DWithin(clean_off_parking.geom, destination.geom, 250, TRUE)",
       point2text(path[path.length-1])
     ).then(result => {
       resObject.parking_spaces = result;
-      //db.any().then(result => {});
+      //db.any("").then(result => {});
 
       console.log(resObject);
       res.send(resObject);
@@ -53,7 +54,7 @@ router.post('/path', (req, res) => {
 
 
 /**
- * # off street parking, destination, 200 metres
+ * # off street parking, destination, 250 metres
  * # no.trees / total_foot_path_distance
  * # ped_volume  $$ sensor_list
  */
