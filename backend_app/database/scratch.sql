@@ -21,9 +21,11 @@ WITH path AS(
   FROM ped_sensor, path
   WHERE ST_DWithin(ped_sensor.geom, path.geom, 200, TRUE)
 )
-SELECT *
+SELECT AVG(hourly_counts)
 FROM sensors, clean_ped_volumn
-WHERE sensors.sensor_id = clean_ped_volumn.sensor_id;
+WHERE sensors.sensor_id = clean_ped_volumn.sensor_id AND
+      clean_ped_volumn.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST')) AND
+      clean_ped_volumn.time = (SELECT EXTRACT(HOUR FROM now() AT TIME ZONE 'AEST'));
 
 CREATE TABLE ped_sensor (
   sensor_id INTEGER,
@@ -40,7 +42,7 @@ DROP COLUMN lon,
 DROP COLUMN geom;
 
 ALTER TABLE clean_ped_volumn
-ADD COLUMN isodow;
+ADD COLUMN isodow INTEGER;
 
 UPDATE clean_ped_volumn SET isodow = (CASE
   WHEN day = 'Monday'    THEN 1
@@ -50,5 +52,33 @@ UPDATE clean_ped_volumn SET isodow = (CASE
   WHEN day = 'Friday'    THEN 5
   WHEN day = 'Saturday'  THEN 6
   WHEN day = 'Sunday'    THEN 7
-  ELSE ''
+  ELSE 0
 END);
+
+SELECT EXTRACT(hour FROM now() AT TIME ZONE 'AEST');
+
+
+
+SELECT lat, lon AS lng
+FROM clean_wheeltoilets
+WHERE ST_DWithin(geom,(SELECT ST_LineFromText('LINESTRING(144.95791 -37.79979, 144.95791 -37.79979)')),200, TRUE);
+
+
+
+
+WITH sensors AS (
+  SELECT sensor_id
+  FROM ped_sensor
+  WHERE ST_DWithin(ped_sensor.geom,
+    (SELECT ST_LineFromText('LINESTRING(144.95791 -37.79979, 144.95791 -37.79979)')), 200, TRUE)
+), acc AS (
+  SELECT AVG(hourly_counts) AS avg
+  FROM sensors, clean_ped_volumn
+  WHERE sensors.sensor_id = clean_ped_volumn.sensor_id AND
+        clean_ped_volumn.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST')) AND
+        clean_ped_volumn.time = (SELECT EXTRACT(HOUR FROM now() AT TIME ZONE 'AEST'))
+  GROUP BY sensors.sensor_id
+)
+SELECT AVG(avg) FROM acc;
+
+

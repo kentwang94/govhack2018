@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../database/db.js');
+const http = require('http');
 
 let points2text = (pts) => {
   return "LINESTRING(" + pts.map(x => '' + x.lng + ' ' + x.lat).join(', ') + ')';
@@ -11,43 +12,113 @@ let point2text = (pt) => {
 };
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   res.render('gov_hack');
 });
 
 router.post('/path', (req, res) => {
+  console.log(req.body);
   let path = req.body['path'];
+  let pathStr = points2text(path);
   let distance = req.body['distance'];
+  let wayPoints = [];
   let resObject = {};
-  db.one( //Query the number of trees within 100 metres along the path
+
+  db.oneOrNone( //Query the number of trees within 100 metres along the path
     "WITH path AS( " +
     "  SELECT ST_LineFromText($1) AS geom " +
     ") " +
     "SELECT COUNT(*) " +
     "FROM clean_trees, path " +
     "WHERE ST_DWithin(clean_trees.geom, path.geom, 100, TRUE)",
-    points2text(path)
+    pathStr
   ).then(result => {
-    let wayPoint = [{lat: -37.81, lng: 144.96}, {lat: -37.80, lng: 144.95}];
+    if (result === null) result = 0;
+    //let wayPoint = [{lat: -37.81, lng: 144.96}, {lat: -37.80, lng: 144.95}];
     resObject.tree_cnt = result;
-    resObject.tree_dist = distance;
-    resObject.tree_per = result / distance;
-    resObject.way_point = wayPoint;
-    resObject.toilet = [{lat: -37.8063, lng: 144.9596}];
-    db.one( //Query the total parking spaces within 250 metres within the destination
+    let _dist = distance['distance']['value'];
+    resObject.tree_per = result / _dist > 0.7 ? 0.7 : result / _dist;
+    db.oneOrNone( //Query the total parking spaces within 250 metres within the destination
       "WITH destination AS( " +
       "  SELECT ST_PointFromText($1) AS geom " +
       ") " +
-      "SELECT SUM(parking_spaces) AS total " +
+      "SELECT SUM(parking_spaces) " +
       "FROM clean_off_parking, destination " +
       "WHERE ST_DWithin(clean_off_parking.geom, destination.geom, 250, TRUE)",
-      point2text(path[path.length-1])
+      point2text(path[path.length - 1])
     ).then(result => {
+      if (result === null) result = 0;
       resObject.parking_spaces = result;
-      //db.any("").then(result => {});
+      db.oneOrNone( // Query the foot path density within 300 metres
+        "WITH sensors AS ( " +
+        "  SELECT sensor_id " +
+        "  FROM ped_sensor " +
+        "  WHERE ST_DWithin(ped_sensor.geom, " +
+        "    (SELECT ST_LineFromText($1)), $2, TRUE) " +
+        "), acc AS ( " +
+        "  SELECT AVG(hourly_counts) AS avg " +
+        "  FROM sensors, clean_ped_volumn " +
+        "  WHERE sensors.sensor_id = clean_ped_volumn.sensor_id AND " +
+        "        clean_ped_volumn.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST')) AND " +
+        "        clean_ped_volumn.time = (SELECT EXTRACT(HOUR FROM now() AT TIME ZONE 'AEST')) " +
+        "  GROUP BY sensors.sensor_id " +
+        ") " +
+        "SELECT AVG(avg) FROM acc",
+        pathStr, 300
+      ).then(result => {
+        if (result === null) result = 0;
+        resObject.foot_per = result > 2000 ? 1 : result / 2000;
+      });
+      db.any( // Query toilets with disabled accessibility within 300 metres
+        "SELECT lat, lon AS lng " +
+        "FROM clean_wheeltoilets " +
+        "WHERE ST_DWithin(geom,(SELECT ST_LineFromText($1)),300, TRUE)",
+        pathStr
+      ).then(result => {
+        resObject.toilet = result;
 
-      console.log(resObject);
-      res.send(resObject);
+
+        http.get('http://43.240.99.61:16666/dialogflow?endLatitude=' +
+          distance['end_location']['lat'] + '&endLongitude=' + distance['end_location']['lng'],
+          (res) => {
+            const {statusCode} = res;
+            const contentType = res.headers['content-type'];
+
+            let error;
+            if (statusCode !== 200) {
+              error = new Error('Request Failed.\n' +
+                `Status Code: ${statusCode}`);
+            } else if (!/^application\/json/.test(contentType)) {
+              error = new Error('Invalid content-type.\n' +
+                `Expected application/json but received ${contentType}`);
+            }
+            if (error) {
+              console.error(error.message);
+              // consume response data to free up memory
+              res.resume();
+              return;
+            }
+            res.setEncoding('utf8');
+            let rawData = '';
+            res.on('data', (chunk) => {
+              rawData += chunk;
+            });
+            res.on('end', () => {
+              try {
+                const parsedData = JSON.parse(rawData);
+                console.log(parsedData);
+                resObject.suggestion = parsedData;
+                console.log(resObject);
+                res.send(resObject);
+              } catch (e) {
+                console.error(e.message);
+              }
+            });
+          }).on('error', (e) => {
+          console.error(`Got error: ${e.message}`);
+        });
+      });
+
     });
   });
 });
