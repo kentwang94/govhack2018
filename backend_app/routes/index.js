@@ -92,6 +92,7 @@ router.post('/path', (req, res) => {
           });
         }
         resObject.sensor_list = _sensors;
+        resObject.way_point = [];
         let avg_cnt = (result.reduce((x, y) => x + y.cnt)) / result.length;
         _foot_per = avg_cnt > 2000 ? 1 : avg_cnt / 2000;
       });
