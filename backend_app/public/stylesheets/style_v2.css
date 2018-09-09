@@ -74,7 +74,7 @@ li:nth-last-child(2) {
     margin-left: 12px;
     padding: 0 11px 0 13px;
     text-overflow: ellipsis;
-    width: 250px;
+    width: 200px;
 }
 
 #origin-input:focus,
@@ -82,23 +82,8 @@ li:nth-last-child(2) {
     border-color: #4d90fe;
 }
 
-#mode-selector {
-    color: #fff;
-    /* background-color: #4d90fe; */
-    margin-left: 12px;
-    padding: 5px 11px 0px 11px;
-  }
-
-  #mode-selector label {
-    font-family: Roboto;
-    font-size: 20px;
-    font-weight: 300;
-    margin-bottom: 20px;
-    display: inline-block;
-  }
-
 /*==========================Sidebar=========================*/
-.leftSidebar {
+.sidebar {
     height: 100%;
     /* 100% Full-height */
     width: 0;
@@ -119,29 +104,8 @@ li:nth-last-child(2) {
     /* 0.5 second transition effect to slide in the sidebar */
     opacity: 0.6;
 }
-.rightSidebar {
-    height: 100%;
-    /* 100% Full-height */
-    width: 0;
-    /* 0 width - change this with JavaScript */
-    position: fixed;
-    /* Stay in place */
-    z-index: 1;
-    /* Stay on top */
-    top: 50px;
-    right: 0;
-    background-color: #111;
-    /* Black*/
-    overflow-x: hidden;
-    /* Disable horizontal scroll */
-    padding-top: 60px;
-    /* Place content 60px from the top */
-    transition: 0.5s;
-    /* 0.5 second transition effect to slide in the sidebar */
-    opacity: 0.6;
-}
 
-.leftSidebar a {
+.sidebar a {
     padding: 8px 8px 8px 32px;
     text-decoration: none;
     font-size: 25px;
@@ -150,28 +114,11 @@ li:nth-last-child(2) {
     transition: 0.3s;
 }
 
-.rightSidebar a{
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #818181;
-    display: block;
-    transition: 0.3s;
-}
-
-.leftSidebar a:hover {
+.sidebar a:hover {
     color: #f1f1f1;
 }
 
-.leftSidebar .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-}
-
-.rightSidebar .closebtn {
+.sidebar .closebtn {
     position: absolute;
     top: 0;
     right: 25px;
@@ -192,15 +139,7 @@ li:nth-last-child(2) {
     background-color: #444;
 }
 
-#leftSide {
-    top: 50px;
-    position: fixed;
-    transition: margin-left .5s;
-    /* If you want a transition effect */
-    z-index: 2000;
-    opacity: 0.5;
-}
-#rightSide{
+#main {
     top: 50px;
     position: fixed;
     transition: margin-left .5s;
@@ -209,6 +148,7 @@ li:nth-last-child(2) {
     z-index: 2000;
     opacity: 0.5;
 }
+
 .checkForm {
     color: white;
     opacity: 0.8;
@@ -240,9 +180,9 @@ span {
 }
 
 #container {
-    padding-left: 50px;
+    padding-left: 80px;
     /* LC width */
-    padding-right: 240px;
+    padding-right: 180px;
     /* RC width */
     height: 100vh;
 }
@@ -257,9 +197,9 @@ span {
 }
 
 #left {
-    width: 50px;
+    width: 80px;
     /* LC width */
-    right:50px;
+    right: 80px;
     /* LC width */
     height: 100%;
     margin-left: -100%;
@@ -267,9 +207,9 @@ span {
 }
 
 #right {
-    width: 240px;
+    width: 180px;
     /* RC width */
-    margin-right: -240px;
+    margin-right: -180px;
     height: 100%;
     /* RC width */
     /* background-color: rgba(51, 51, 51, 0.295); */
