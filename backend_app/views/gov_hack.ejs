@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Place Autocomplete and Directions</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <link rel="stylesheet" href="stylesheets/style.css">
-  </head>
-  <body>
-    <div id="header">
-      <ul>
+</head>
+<body>
+<div id="header">
+    <ul>
         <li><a href="#">Home</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Login</a></li>
         <li><a href="#">Signup</a></li>
-      </ul>
-    </div>
-    <input id="origin-input" class="controls" type="text" placeholder="Origin location">
-    <input id="destination-input" class="controls" left = 300px type="text" placeholder="Destination location">
-    
-    <div id="leftSidebar" class="leftSidebar">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeLeftNav()">&times;</a>
-      <form class="checkForm">
+    </ul>
+</div>
+<input id="origin-input" class="controls" type="text" placeholder="Origin location">
+<input id="destination-input" class="controls" left=300px type="text" placeholder="Destination location">
+
+<div id="leftSidebar" class="leftSidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeLeftNav()">&times;</a>
+    <form class="checkForm">
         <h2>Personal</h2>
         <br>
         <br>
@@ -33,53 +33,53 @@
         <br>
         <br>
         <input id="disability" type="checkbox" onchange='handleChange(this);' value=false><span>Disability</span>
-      </form>
-    </div>
-    
-    
-    <div id="rightSidebar" class="rightSidebar">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeRightNav()">&times;</a>
-      <div id="mode-selector" class="controls">
+    </form>
+</div>
+
+
+<div id="rightSidebar" class="rightSidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeRightNav()">&times;</a>
+    <div id="mode-selector" class="controls">
         <h1>
-          Our Suggestion:
+            Our Suggestion:
         </h1>
         <br>
-        <p id="output_1" style ="font-size: 17px"></p>
+        <p id="output_1" style="font-size: 17px"></p>
         <br>
-        <p id="output_2" style ="font-size: 17px"></p>
+        <p id="output_2" style="font-size: 17px"></p>
         <br>
-        <p id="output_3" style ="font-size: 17px"></p>
+        <p id="output_3" style="font-size: 17px"></p>
         <br>
-        <p id="output_4" style ="font-size: 17px"></p>
-        <br>
-        <br>
+        <p id="output_4" style="font-size: 17px"></p>
         <br>
         <br>
         <br>
         <br>
-       <h2>You can decide which travaling mode you want to use:</h2>
+        <br>
+        <br>
+        <h2>You can decide which travaling mode you want to use:</h2>
         <br>
         <br>
         <input type="radio" name="type" id="walking">
-        <label id = "walking_v" for="walking" >Walking </label>
+        <label id="walking_v" for="walking">Walking </label>
         <br>
         <input type="radio" name="type" id="driving">
-        <label id = "driving_v" for="driving"> Driving</label>
-      </div>
+        <label id="driving_v" for="driving"> Driving</label>
     </div>
+</div>
 
 
-      <div id="leftSide">
-        <button id="openLeftNav" class="openbtn" onclick="openLeftNav()">&#9776;</button>
-      </div>
+<div id="leftSide">
+    <button id="openLeftNav" class="openbtn" onclick="openLeftNav()">&#9776;</button>
+</div>
 
-      <div id="container">
-        <div id="map" class="column"></div>
-        <div id="left" class="column"></div>
-        <!-- <div id="right" class="column"></div> -->
-      </div>
+<div id="container">
+    <div id="map" class="column"></div>
+    <div id="left" class="column"></div>
+    <!-- <div id="right" class="column"></div> -->
+</div>
 
-      <div id="footer"></div>
+<div id="footer"></div>
 
 <script>
   // This example requires the Places library. Include the libraries=places
@@ -107,7 +107,7 @@
     }
   }
 
-  function closeRightNav(){
+  function closeRightNav() {
     document.getElementById("rightSidebar").style.width = "0";
     document.getElementById("map").style.width = "100%";
   }
@@ -197,8 +197,8 @@
         xhr.open("POST", "/path", true);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.responseType = 'json';
-        me.setupClickListener('walking', 'WALKING',wayPts,features, sensors);
-        me.setupClickListener('driving', 'DRIVING', wayPts,features, sensors); 
+        me.setupClickListener('walking', 'WALKING', wayPts, features, sensors);
+        me.setupClickListener('driving', 'DRIVING', wayPts, features, sensors);
         xhr.onreadystatechange = function () {
           if (this.readyState === 4 && this.status === 200) {
             let body = xhr.response;
@@ -207,26 +207,26 @@
             let sensorList = body.sensor_list;
             let sug = body.suggestion;
             console.log(body);
-            for (let toilet of toilet_list){
+            for (let toilet of toilet_list) {
               features.push({
                 position: new google.maps.LatLng(toilet.lat, toilet.lng)
               });
             }
-            for (let pt of pts){
+            for (let pt of pts) {
               wayPts.push({
                 location: {lat: pt.lat, lng: pt.lng},
                 stopover: true
               });
             }
-            for (let sensor of sensorList){
+            for (let sensor of sensorList) {
               sensors.push({
-                  center: sensor.center,
-                  radius: sensor.radius
+                center: sensor.center,
+                radius: sensor.radius
               });
             }
             let output_one = "The air quality is " + sug.air_quality + ".";
             let output_two = "There is " + Math.round(sug.car_park_vacant_rate * 100) + "% availability of car park around your destination.";
-            let output_three = "The weather is " + sug.weather + "." ;
+            let output_three = "The weather is " + sug.weather + ".";
             let output_four = "We suggest you to " + sug.mode + ".";
             document.getElementById("output_1").innerHTML = output_one
             document.getElementById("output_2").innerHTML = output_two
@@ -234,7 +234,7 @@
             document.getElementById("output_4").innerHTML = output_four
 
             document.getElementById("rightSidebar").style.width = "19%";
-            document.getElementById("map").style.width = "80%";  
+            document.getElementById("map").style.width = "80%";
           }
         };
         let send_path = (mapResponse.routes[0].overview_path).map(x => x.toJSON());
@@ -268,52 +268,31 @@
       //waypoints: waypts,
       //optimizeWaypoints: true
     }, function (response, status) {
-      if (status === 'OK') { 
+      if (status === 'OK') {
         me.directionsDisplay.setDirections(response);
-        features.forEach(function(feature) {
+        features.forEach(function (feature) {
           var marker = new google.maps.Marker({
             position: feature.position,
             icon: {
               url: '/images/toilet.png',
               scaledSize: new google.maps.Size(25, 25),
-              origin: new google.maps.Point(0,0), // origin
+              origin: new google.maps.Point(0, 0), // origin
               anchor: new google.maps.Point(0, 0)
             },
             map: map,
 
           });
         });
-        // sensors.forEach(function(sensor) {
-        //   console.log(sensor);
-        //   var volumeCircle = new google.maps.Circle({
-        //     strokeColor: '#FF0000',
-        //     strokeOpacity: 0.8,
-        //     strokeWeight: 0,
-        //     fillColor: '#FF0000',
-        //     fillOpacity: 0.35,
-        //     map: map,
-        //     center: sensor.center,
-        //     radius: sensor.radius
-        //   });
-        // });
-        // for (var feature in features) {
-        //   var marker = new google.maps.Marker({
-        //     position: feature.position,
-        //     icon: toiletIcon,
-        //     map:map
-        //   });
-        // }
         for (let i of sensors) {
-          console.log(i);
           var volumeCircle = new google.maps.Circle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: '#FF0000',
+            strokeWeight: 0,
+            fillColor: '#ff5906',
             fillOpacity: 0.35,
             map: map,
             center: i.center,
-            radius: i.radius*100
+            radius: i.radius
           });
         }
       } else {
@@ -321,16 +300,14 @@
       }
     });
   };
-
-  AutocompleteDirectionsHandler.prototype.setupClickListener = function(id, mode, wayPts, features, sensors) {
-        var radioButton = document.getElementById(id);
-        var me = this;
-        radioButton.addEventListener('click', function() {
-          me.travelMode = mode;
-          me.routeTwo(wayPts, features, sensors);
-        });
-      };
-
+  AutocompleteDirectionsHandler.prototype.setupClickListener = function (id, mode, wayPts, features, sensors) {
+    var radioButton = document.getElementById(id);
+    var me = this;
+    radioButton.addEventListener('click', function () {
+      me.travelMode = mode;
+      me.routeTwo(wayPts, features, sensors);
+    });
+  };
 
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAty0toJ0mIxSCgA03HJq2IcgLArpRh1Rk&libraries=places&callback=initMap"
