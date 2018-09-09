@@ -31,31 +31,11 @@
     <div id="rightSidebar" class="rightSidebar">
       <a href="javascript:void(0)" class="closebtn" onclick="closeRightNav()">&times;</a>
       <div id="mode-selector" class="controls">
-        <h1>
-          Our Suggestion:
-        </h1>
-        <br>
-        <p id="output_1" style ="font-size: 17px"></p>
-        <br>
-        <p id="output_2" style ="font-size: 17px"></p>
-        <br>
-        <p id="output_3" style ="font-size: 17px"></p>
-        <br>
-        <p id="output_4" style ="font-size: 17px"></p>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-       <h2>You can decide which travaling mode you want to use:</h2>
-        <br>
-        <br>
-        <input type="radio" name="type" id="walking">
-        <label id = "walking_v" for="walking" >Walking </label>
-        <br>
-        <input type="radio" name="type" id="driving">
-        <label id = "driving_v" for="driving"> Driving</label>
+          <input type="radio" name="type" id="walking" checked="checked">
+          <label for="walking" >Walking</label>
+          <br>
+          <input type="radio" name="type" id="driving">
+          <label for="driving">Driving</label>
       </div>
     </div>
 
@@ -67,7 +47,7 @@
       <div id="container">
         <div id="map" class="column"></div>
         <div id="left" class="column"></div>
-        <!-- <div id="right" class="column"></div> -->
+        <div id="right" class="column"></div>
       </div>
 
       <div id="footer"></div>
@@ -79,8 +59,9 @@
 
 
   function openLeftNav() {
-    document.getElementById("leftSidebar").style.width = "15%";
-    document.getElementById("leftSide").style.marginLeft = "15%";
+    document.getElementById("leftSidebar").style.width = "20%";
+    document.getElementById("leftSide").style.marginLeft = "20%";
+  k
   }
 
   function closeLeftNav() {
@@ -99,7 +80,7 @@
 
   function closeRightNav(){
     document.getElementById("rightSidebar").style.width = "0";
-    document.getElementById("map").style.width = "100%";
+    document.getElementById("rightSide").style.marginLeft = "0";
   }
 
 
@@ -123,6 +104,7 @@
     this.travelMode = 'WALKING';
     var originInput = document.getElementById('origin-input');
     var destinationInput = document.getElementById('destination-input');
+    // var modeSelector = document.getElementById('mode-selector');
     this.directionsService = new google.maps.DirectionsService;
     this.directionsDisplay = new google.maps.DirectionsRenderer;
     this.directionsDisplay.setMap(map);
@@ -138,14 +120,8 @@
     this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
     this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(destinationInput);
 
-// for testing
-    // document.getElementById("rightSidebar").style.width = "19%";
-    // document.getElementById("map").style.width = "80%";
-
-    // document.getElementById("output_1").innerHTML = "The air quality is very good."
-    // document.getElementById("output_2").innerHTML = "There is 100% availability of car park around your destination."
-    // document.getElementById("output_3").innerHTML = "The weather is very good."
-    // document.getElementById("output_4").innerHTML = "We suggest you to walk."
+    document.getElementById("rightSidebar").style.width = "19%";
+    document.getElementById("rightSidebar").style.marginLeft = "200px"; 
 
   }
 
@@ -174,56 +150,56 @@
       return;
     }
     var me = this;
-    let features = [];
-    let wayPts = [];
-    let sensors = [];
+
     this.directionsService.route({
       origin: {'placeId': this.originPlaceId},
       destination: {'placeId': this.destinationPlaceId},
       travelMode: this.travelMode
     }, function (mapResponse, status) {
       if (status === 'OK') {
+        // wayPts.push({
+        //   location: {lat:-34, lng:151},
+        //   stopover: true
+        // });
+        // me.routeTwo(wayPts)
         let xhr = new XMLHttpRequest();
         xhr.open("POST", "/path", true);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.responseType = 'json';
-        me.setupClickListener('walking', 'WALKING',wayPts,features, sensors);
-        me.setupClickListener('driving', 'DRIVING', wayPts,features, sensors); 
+        me.setupClickListener('walking', 'WALKING');
+        me.setupClickListener('driving', 'DRIVING'); 
         xhr.onreadystatechange = function () {
           if (this.readyState === 4 && this.status === 200) {
             let body = xhr.response;
             let toilet_list = body.toilet;
             let pts = body.way_point;
             let sensorList = body.sensor_list;
-            let sug = body.suggestion;
+            let prob = body.prob;
             console.log(body);
+            
+            let features = [];
             for (let toilet of toilet_list){
               features.push({
                 position: new google.maps.LatLng(toilet.lat, toilet.lng)
-              });
+              })
             }
+            let wayPts = [];
             for (let pt of pts){
               wayPts.push({
                 location: {lat: pt.lat, lng: pt.lng},
                 stopover: true
               });
             }
+            let sensors = []
             for (var sensor in sensorList){
               sensors.push({
                 sensor: {center:{lat: sensor.lat, lng:sensor.lng}, radius:sensor.radius}
-              });
+              })
             }
-            let output_one = "The air quality is " + sug.air_quality + ".";
-            let output_two = "There is " + sug.car_park_vacant_rate * 100 + "% availability of car park around your destination.";
-            let output_three = "The weather is " + sug.weather + "." ;
-            let output_four = "We suggest you to " + sug.mode + ".";
-            document.getElementById("output_1").innerHTML = output_one
-            document.getElementById("output_2").innerHTML = output_two
-            document.getElementById("output_3").innerHTML = output_three
-            document.getElementById("output_4").innerHTML = output_four
-
-            document.getElementById("rightSidebar").style.width = "19%";
-            document.getElementById("map").style.width = "80%";  
+            document.getElementById("rightSidebar").style.width = "17%";
+            document.getElementById("rightSidebar").style.display = "block"; 
+            me.setupClickListener('walking', 'WALKING');
+            me.setupClickListener('driving', 'DRIVING'); 
           }
         };
         let send_path = (mapResponse.routes[0].overview_path).map(x => x.toJSON());
@@ -244,29 +220,29 @@
       }
     });
   };
-
-  AutocompleteDirectionsHandler.prototype.routeTwo = function (waypts, features, sensors) {
+  AutocompleteDirectionsHandler.prototype.routeTwo = function (waypts, features, sensors, p) {
     if (!this.originPlaceId || !this.destinationPlaceId) {
       return;
     }
     var me = this;
     var toiletIcon = '/toilet.png';
+    console.log("Yes!!!!!!!!!!!!!");
     this.directionsService.route({
       origin: {'placeId': this.originPlaceId},
       destination: {'placeId': this.destinationPlaceId},
       travelMode: me.travelMode,
-      //waypoints: waypts,
-      //optimizeWaypoints: true
+      waypoints: waypts,
+      optimizeWaypoints: true
     }, function (response, status) {
       if (status === 'OK') { 
         me.directionsDisplay.setDirections(response);
-        for (var feature in features) {
+        features.forEach(function(feature) {
           var marker = new google.map.Marker({
             position: feature.position,
             icon: toiletIcon,
             map:map
-          });
-        }
+          })
+        });
         for (var i in sensors) {
           var volumeCircle = new google.maps.Circle({
             strokeColor: '#FF0000',
@@ -285,22 +261,18 @@
     });
   };
 
-  AutocompleteDirectionsHandler.prototype.setupClickListener = function(id, mode, wayPts, features, sensors) {
+  AutocompleteDirectionsHandler.prototype.setupClickListener = function(id, mode) {
         var radioButton = document.getElementById(id);
         var me = this;
         radioButton.addEventListener('click', function() {
           me.travelMode = mode;
-          me.routeTwo(wayPts, features, sensors);
+          me.routeTwo(wayPts, features, sensors, prob);
         });
       };
 
 
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAty0toJ0mIxSCgA03HJq2IcgLArpRh1Rk&libraries=places&callback=initMap"
-        async defer></script>
-</body>
-</html>
-js?key=AIzaSyAty0toJ0mIxSCgA03HJq2IcgLArpRh1Rk&libraries=places&callback=initMap"
         async defer></script>
 </body>
 </html>

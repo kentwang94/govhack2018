@@ -7,8 +7,6 @@
     box-sizing: inherit;
 }
 
-
-
 /* Optional: Makes the sample page fill the window. */
 html {
     font-size: 62.5%;
@@ -87,20 +85,17 @@ li:nth-last-child(2) {
 #mode-selector {
     color: #fff;
     /* background-color: #4d90fe; */
-    margin-top: 20px;
-    margin-left: 15px;
+    margin-left: 12px;
     padding: 5px 11px 0px 11px;
   }
 
-#mode-selector label {
+  #mode-selector label {
     font-family: Roboto;
-    font-size: 15px;
+    font-size: 20px;
     font-weight: 300;
-    margin-bottom: 10px;
-    margin-left:20px;
+    margin-bottom: 20px;
     display: inline-block;
   }
-
 
 /*==========================Sidebar=========================*/
 .leftSidebar {
@@ -242,12 +237,13 @@ span {
          * element that contains the map. */
 #map {
     height: 100%;
-    width: 100%;
-    transition: width .5s;
 }
 
 #container {
     padding-left: 50px;
+    /* LC width */
+    padding-right: 240px;
+    /* RC width */
     height: 100vh;
 }
 
@@ -256,6 +252,9 @@ span {
     float: left;
 }
 
+#map {
+    width: 100%;
+}
 
 #left {
     width: 50px;
