@@ -220,7 +220,10 @@
             }
             for (let sensor of sensorList){
               sensors.push({
-                sensor: {center:{lat: sensor.lat, lng:sensor.lng}, radius:sensor.radius}
+                sensor: {
+                  center: sensor.center,
+                  radius: sensor.radius
+                }
               });
             }
             let output_one = "The air quality is " + sug.air_quality + ".";
