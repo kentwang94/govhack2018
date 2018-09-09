@@ -81,16 +81,17 @@ router.post('/path', (req, res) => {
         "      distinct_foot.time = (SELECT EXTRACT(HOUR FROM now() AT TIME ZONE 'AEST'))",
         pathStr
       ).then(result => {
+        console.log(result);
         if (result === null) result = [];
         if (!(result instanceof Array)) result = [].push(result);
-        console.log(result);
-        resObject.sensors = [];
+        let _sensors = [];
         for (let r of result) {
-          resObject.sensors.push({
+          _sensors.push({
             center: {lat: r.lat, lng: r.lng},
             radius: r.density * 80
           });
         }
+        resObject.sensor_list = _sensors;
         let avg_cnt = (result.reduce((x, y) => x + y.hourly_counts)) / result.length;
         _foot_per = avg_cnt > 2000 ? 1 : avg_cnt / 2000;
       });
