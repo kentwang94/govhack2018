@@ -19,6 +19,10 @@ date: Sunday, 9 September, 2018
 - A web application provides navigation and suggestions.
 - A chatbot deployed on home intelligence which can provide suggestions.
 
+## Project Development
+
+The app is host by Express.js, and the database is powered by PostgreSQL with PostGIS extension. In addition, the real time data (weather, air quality, carpark vacant information) is retrieved by Flask.
+
 ## Team Member
 
 + Masson
