@@ -89,12 +89,16 @@ router.post('/path', (req, res) => {
         for (let r of result) {
           _sensors.push({
             center: {lat: r.lat, lng: r.lng},
-            radius: r.density * 80
+            radius: r.density * 100
           });
           _sum_cnt += parseFloat(r.cnt);
         }
         resObject.sensor_list = _sensors;
-        resObject.way_point = [];
+        resObject.way_point = [
+          { lat: -37.809746, lng: 144.972304 },
+          { lat: -37.816474, lng: 144.967151 },
+          { lat: -37.825053, lng: 144.970472 }
+        ];
         let avg_cnt = _sum_cnt / result.length;
         _foot_per = avg_cnt > 2000 ? 1 : avg_cnt / 2000;
       });
