@@ -265,8 +265,8 @@
       origin: {'placeId': this.originPlaceId},
       destination: {'placeId': this.destinationPlaceId},
       travelMode: me.travelMode,
-      //waypoints: waypts,
-      //optimizeWaypoints: true
+      waypoints: waypts,
+      optimizeWaypoints: true
     }, function (response, status) {
       if (status === 'OK') {
         me.directionsDisplay.setDirections(response);
@@ -276,7 +276,7 @@
             icon: {
               url: '/images/toilet.png',
               scaledSize: new google.maps.Size(25, 25),
-              origin: new google.maps.Point(0, 0), // origin
+              origin: new google.maps.Point(0, 0),
               anchor: new google.maps.Point(0, 0)
             },
             map: map,
