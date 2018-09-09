@@ -23,8 +23,6 @@ router.get('/', function (req, res, next) {
 router.post('/path', (req, res) => {
   console.log(req.body);
   let path = req.body['path'];
-  console.log(req.body['diability'] === false);
-  console.log(req.body['diability'] === 'false');
   let pathStr = points2text(path);
   let distance = req.body['distance'];
   let wayPoints = [];
@@ -62,25 +60,39 @@ router.post('/path', (req, res) => {
     ).then(result => {
       if (result === null) result = 0;
       _parkings = result['sum'];
-      db.oneOrNone( // Query the foot path density within 300 metres
-        "WITH sensors AS ( " +
-        "  SELECT sensor_id " +
+      db.any( // Query the foot path density within 300 metres
+        "WITH distinct_foot AS ( " +
+        "  SELECT isodow, time, sensor_id, AVG(hourly_counts) AS hourly_counts " +
+        "  FROM clean_ped_volumn " +
+        "  GROUP BY isodow, time, sensor_id " +
+        "), sensors AS ( " +
+        "  SELECT sensor_id, geom " +
         "  FROM ped_sensor " +
-        "  WHERE ST_DWithin(ped_sensor.geom, " +
-        "    (SELECT ST_LineFromText($1)), 300, TRUE) " +
-        "), acc AS ( " +
-        "  SELECT AVG(hourly_counts) AS avg " +
-        "  FROM sensors, clean_ped_volumn " +
-        "  WHERE sensors.sensor_id = clean_ped_volumn.sensor_id AND " +
-        "        clean_ped_volumn.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST')) AND " +
-        "        clean_ped_volumn.time = (SELECT EXTRACT(HOUR FROM now() AT TIME ZONE 'AEST')) " +
-        "  GROUP BY sensors.sensor_id " +
+        "  WHERE ST_DWithin(ped_sensor.geom, (SELECT ST_LineFromText('$1')), 1200, TRUE)" +
+        "), max_cnt AS ( " +
+        "  SELECT MAX(hourly_counts) AS ans " +
+        "  FROM distinct_foot " +
+        "  WHERE distinct_foot.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST'))" +
         ") " +
-        "SELECT AVG(avg) FROM acc",
+        "SELECT hourly_counts AS cnt, hourly_counts / max_cnt.ans AS density, ST_X(sensors.geom) AS lng, ST_Y(sensors.geom) AS lat" +
+        "FROM sensors, distinct_foot, max_cnt " +
+        "WHERE sensors.sensor_id = distinct_foot.sensor_id AND " +
+        "      distinct_foot.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST')) AND " +
+        "      distinct_foot.time = (SELECT EXTRACT(HOUR FROM now() AT TIME ZONE 'AEST'))",
         pathStr
       ).then(result => {
-        if (result === null) result = 0;
-        _foot_per = result > 2000 ? 1 : result / 2000;
+        if (result === null) result = [];
+        if (!(result instanceof Array)) result = [].push(result);
+        console.log(result);
+        resObject.sensors = [];
+        for (let r of result) {
+          resObject.sensors.push({
+            center: {lat: r.lat, lng: r.lng},
+            radius: r.density * 80
+          });
+        }
+        let avg_cnt = (result.reduce((x, y) => x + y.hourly_counts)) / result.length;
+        _foot_per = avg_cnt > 2000 ? 1 : avg_cnt / 2000;
       });
       db.any( // Query toilets with disabled accessibility within 300 metres
         "SELECT lat, lon AS lng " +
@@ -131,18 +143,19 @@ router.post('/path', (req, res) => {
                 for (let i = 0; i < 5; i ++){
                   statScore += statNum[i] *statMode1[i];
                 }
-                if (req.body['wandering']) {
+                if (req.body['wandering'] === 'true') {
                   statScore = 0;
                   for (let i = 0; i < 5; i ++){
                     statScore += statNum[i] *statMode2[i];
                   }
                 }
-                if (req.body['diability']) {
+                if (req.body['diability'] === 'true') {
                   statScore = 0;
                   for (let i = 0; i < 5; i ++){
                     statScore += statNum[i] *statMode3[i];
                   }
                 }
+                console.log(statScore);
                 resObject.suggestion['mode'] = statScore > 0.5 ? 'walk' : 'drive';
                 console.log(resObject);
                 res.send(resObject);

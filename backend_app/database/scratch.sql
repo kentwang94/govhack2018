@@ -69,8 +69,7 @@ WHERE ST_DWithin(geom,(SELECT ST_LineFromText('LINESTRING(144.95791 -37.79979, 1
 WITH sensors AS (
   SELECT sensor_id
   FROM ped_sensor
-  WHERE ST_DWithin(ped_sensor.geom,
-    (SELECT ST_LineFromText('LINESTRING(144.95791 -37.79979, 144.95791 -37.79979)')), 200, TRUE)
+  WHERE ST_DWithin(ped_sensor.geom, (SELECT ST_LineFromText('LINESTRING(144.95791 -37.79979, 144.95791 -37.79979)')), 200, TRUE)
 ), acc AS (
   SELECT AVG(hourly_counts) AS avg
   FROM sensors, clean_ped_volumn
@@ -82,3 +81,21 @@ WITH sensors AS (
 SELECT AVG(avg) FROM acc;
 
 
+WITH distinct_foot AS (
+  SELECT isodow, time, sensor_id, AVG(hourly_counts) AS hourly_counts
+  FROM clean_ped_volumn
+  GROUP BY isodow, time, sensor_id
+), sensors AS (
+  SELECT sensor_id, geom
+  FROM ped_sensor
+  WHERE ST_DWithin(ped_sensor.geom, (SELECT ST_LineFromText('LINESTRING(144.95791 -37.79979, 144.95791 -37.79979)')), 1200, TRUE)
+), max_cnt AS (
+  SELECT MAX(hourly_counts) AS ans
+  FROM distinct_foot
+  WHERE distinct_foot.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST'))
+)
+SELECT hourly_counts AS cnt, hourly_counts / max_cnt.ans AS density, ST_X(sensors.geom) AS lng, ST_Y(sensors.geom) AS lat
+FROM sensors, distinct_foot, max_cnt
+WHERE sensors.sensor_id = distinct_foot.sensor_id AND
+      distinct_foot.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST')) AND
+      distinct_foot.time = (SELECT EXTRACT(HOUR FROM now() AT TIME ZONE 'AEST'));
