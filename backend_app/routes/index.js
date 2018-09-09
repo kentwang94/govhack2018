@@ -68,13 +68,13 @@ router.post('/path', (req, res) => {
         "), sensors AS ( " +
         "  SELECT sensor_id, geom " +
         "  FROM ped_sensor " +
-        "  WHERE ST_DWithin(ped_sensor.geom, (SELECT ST_LineFromText($1)), 300, TRUE)" +
+        "  WHERE ST_DWithin(ped_sensor.geom, (SELECT ST_LineFromText($1)), 300, TRUE) " +
         "), max_cnt AS ( " +
         "  SELECT MAX(hourly_counts) AS ans " +
         "  FROM distinct_foot " +
-        "  WHERE distinct_foot.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST'))" +
+        "  WHERE distinct_foot.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST')) " +
         ") " +
-        "SELECT hourly_counts AS cnt, hourly_counts / max_cnt.ans AS density, ST_X(sensors.geom) AS lng, ST_Y(sensors.geom) AS lat" +
+        "SELECT hourly_counts AS cnt, hourly_counts / max_cnt.ans AS density, ST_X(sensors.geom) AS lng, ST_Y(sensors.geom) AS lat " +
         "FROM sensors, distinct_foot, max_cnt " +
         "WHERE sensors.sensor_id = distinct_foot.sensor_id AND " +
         "      distinct_foot.isodow = (SELECT EXTRACT(ISODOW FROM now() AT TIME ZONE 'AEST')) AND " +
@@ -92,7 +92,7 @@ router.post('/path', (req, res) => {
           });
         }
         resObject.sensor_list = _sensors;
-        let avg_cnt = (result.reduce((x, y) => x + y.hourly_counts)) / result.length;
+        let avg_cnt = (result.reduce((x, y) => x + y.cnt)) / result.length;
         _foot_per = avg_cnt > 2000 ? 1 : avg_cnt / 2000;
       });
       db.any( // Query toilets with disabled accessibility within 300 metres
